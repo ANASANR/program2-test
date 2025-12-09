@@ -83,7 +83,7 @@ for epoch in range(n_epochs):
 
     time_start = time.time()
     val_acc = models.test_accuracy(model, dataloader_test)
-    
+    time_end = time.time()
     print(f'   validation accuracy: {val_acc*100:.3f}% ({time_end-time_start:.3f}s)')
 
     val_acc_log.append(val_acc)
