@@ -1,0 +1,102 @@
+import time
+
+import matplotlib.pyplot as plt
+
+import torch
+from torchvision import datasets
+import torchvision.transforms.v2 as transforms
+
+import models
+
+# データセットの前処理を定義
+ds_transform = transforms.Compose([
+    transforms.ToImage(),
+    transforms.ToDtype(torch.float32, scale=True)
+])
+
+ds_train = datasets.FashionMNIST(
+    root='data',
+    train=True,
+    transform=ds_transform
+)
+ds_test = datasets.FashionMNIST(
+    root='data',
+    train=False,
+    download=True,
+    transform=ds_transform
+)
+
+batch_size = 64
+dataloader_train = torch.utils.data.DataLoader(
+    ds_train,
+    batch_size=batch_size,
+    shuffle=True
+)
+dataloader_test = torch.utils.data.DataLoader(
+    ds_test,
+    batch_size=batch_size
+)
+
+# バッチを取り出す実験
+# for image_batch, label_batch in dataloader_test:
+#     print(image_batch.shape)
+#     print(label_batch.shape)
+    
+# モデルのインスタンスを作成
+model = models.MyModel()
+
+# 損失関数 (誤差関数・ロス関数)
+loss_fn = torch.nn.CrossEntropyLoss()
+
+# 最適化方法の選択
+learning_rate = 1e-3  # 学習率
+optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate)
+
+n_epochs = 5
+
+train_loss_log = []
+val_loss_log = []
+train_acc_log = []
+val_acc_log = []
+
+for epoch in range(n_epochs):
+    print(f'epoch {epoch+1}/{n_epochs}')
+
+    time_start = time.time()
+    train_loss = models.train(model, dataloader_train, loss_fn, optimizer)
+    print(f'   training loss :{train_loss:.3f} ({time_end-time_start:.3f}s)')
+    time_end = time.time()
+    train_loss_log.append(train_loss)
+
+    val_loss = models.test(model, dataloader_test, loss_fn)
+    print(f'   validation loss: {val_loss:.3f}')
+    val_loss_log.append(val_loss)
+
+    train_acc = models.test_accuracy(model, dataloader_train)
+    print(f'   training accuracy: {train_acc*100:.3}%')
+    train_acc_log.append(train_acc)
+
+    val_acc = models.test_accuracy(model, dataloader_test)
+    print(f'   validation accuracy: {val_acc*100:.3f}%')
+    val_acc_log.append(val_acc)
+
+# グラフ表示
+plt.subplot(1, 2, 1)
+plt.plot(range(1, n_epochs+1), train_loss_log, label='train')
+plt.plot(range(1, n_epochs+1), val_loss_log, label='validation')
+plt.xlabel('epochs')
+plt.xticks(range(1, n_epochs+1))
+plt.ylabel('loss')
+plt.legend()
+plt.grid()
+
+
+plt.subplot(1, 2, 2)
+plt.plot(range(1, n_epochs+1), train_acc_log, label='train')
+plt.plot(range(1, n_epochs+1), val_acc_log, label='validation')
+plt.xlabel('epochs')
+plt.xticks(range(1, n_epochs+1))
+plt.ylabel('accuracy')
+plt.legend()
+plt.grid()
+plt.show()
