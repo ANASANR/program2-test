@@ -76,9 +76,17 @@ def test(model, dataloader, loss_fn):
     """1エポック分のロスを計算"""
     loss_total = 0.0
 
+    #モデルにデバイスを調べる
+    device = next(model.parameters()).device
+
     model.eval()
     with torch.no_grad():
         for image_batch, label_batch in dataloader:
+
+            # バッチを、 model と同じデバイスに転送する
+            image_batch = image_batch.to(device)
+            label_batch = label_batch.to(device)
+
             # モデルにバッチを入れて、ロジットを計算
             logits_batch = model(image_batch)
 
