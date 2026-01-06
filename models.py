@@ -33,7 +33,8 @@ def test_accuracy(model, dataloader):
     with torch.no_grad():
         for image_batch, label_batch in dataloader:
             # バッチを、 model と同じデバイスに転送する
-            n_corrects = 0 #正解の個数
+            image_batch = image_batch.to(device)
+            label_batch = label_batch.to(device)
 
             # モデルに入れて結果 logits を出す
             logits_batch = model(image_batch)
