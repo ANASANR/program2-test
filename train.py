@@ -17,6 +17,7 @@ ds_transform = transforms.Compose([
 ds_train = datasets.FashionMNIST(
     root='data',
     train=True,
+    download=True,
     transform=ds_transform
 )
 ds_test = datasets.FashionMNIST(
