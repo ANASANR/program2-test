@@ -55,7 +55,7 @@ def train(model, dataloader, loss_fn, optimizer):
     model.train()
     for image_batch, label_batch in dataloader:
          # バッチを、 model と同じデバイスに転送する
-        image_batch = image_batch.to(device) #正解の個数
+        image_batch = image_batch.to(device)
         label_batch = label_batch.to(device)
 
         # モデルにバッチを入れて計算
